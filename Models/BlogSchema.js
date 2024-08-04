@@ -17,6 +17,14 @@ const BlogSchema = mongoose.Schema( {
     type: String,
     require: true,
   },
+  description: {
+    type: String,
+    require: true,
+  },
+  timeDate: {
+    type: String,
+    require: true,
+  },
 } );
 
 const blog = new mongoose.model( 'blog', BlogSchema );

@@ -28,5 +28,8 @@ Router
 Router
   .route( '/blog' )
   .post( Controller.deleteBlog );
+Router
+  .route( '/nav' )
+  .post( Controller.LoginInfo );
 
 module.exports = Router;

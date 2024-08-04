@@ -1,10 +1,11 @@
 const user = require( '../Models/Schema' );
 const blogSchema = require( '../Models/BlogSchema' );
-
 const crypto = require( 'crypto' );
+const jwt = require( 'jsonwebtoken' );
 
 
 const home = async ( req, res ) => {
+
   try {
     const allBlogs = await blogSchema.find();
 
@@ -39,7 +40,7 @@ const signup = async ( req, res ) => {
         status: 'success',
         User: {
           username: await userCreated.username,
-          id: await userCreated._id.toString(),
+          token: await userCreated.generateToken(),
         }
       } );
 
@@ -112,7 +113,7 @@ const userBlogs = async ( req, res ) => {
 
 const addBlog = async ( req, res ) => {
   try {
-    const { username, title, blog } = req.body;
+    const { username, title, blog, description } = req.body;
 
     const UserExist = await user.findOne( { username } );
     if ( !UserExist ) {
@@ -123,11 +124,23 @@ const addBlog = async ( req, res ) => {
     const size = 6; // Desired length of the ID
     const blogId = generateId( size );
 
+    const now = new Date();
+
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1; // Months are zero-indexed
+    const day = now.getDate();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+
+    const timeDate = `${ hours }:${ minutes } ${ day }/${ month }/${ year }`;
+
     const addedBlog = await blogSchema.create( {
       username,
       title,
       blog,
-      blogId
+      blogId,
+      description,
+      timeDate,
     } );
 
     res
@@ -146,14 +159,14 @@ const addBlog = async ( req, res ) => {
 
 const updateBlog = async ( req, res ) => {
   try {
-    const { blogId, username, title, blog } = req.body;
+    const { blogId, username, title, blog, description } = req.body;
 
     const UserExist = await user.findOne( { username } );
     if ( !UserExist ) {
       return res.status( 400 ).json( { status: 'unsuccess', message: 'User does not Exist!' } );
     }
 
-    const updatedBlog = await blogSchema.findOneAndUpdate( { blogId }, {  username, title, blog }, { returnOriginal: false } );
+    const updatedBlog = await blogSchema.findOneAndUpdate( { blogId }, { username, title, blog, description }, { returnOriginal: false } );
 
     res
       .status( 201 )
@@ -193,6 +206,27 @@ const deleteBlog = async ( req, res ) => {
 
 };
 
+const LoginInfo = async ( req, res ) => {
+  try {
+    const { token } = req.body;
+
+    const verified = jwt.verify( token, process.env.SECRET_KEY );
+    const userdata = await user.findOne( { username: verified.username } );
+
+    res.json( {
+      status: 'success',
+      User: {
+        username: await userdata.username,
+      }
+    } );
+
+  } catch ( error ) {
+    res
+      .status( 400 )
+      .send( error );
+  }
+};
+
 module.exports = {
   home,
   login,
@@ -200,5 +234,6 @@ module.exports = {
   addBlog,
   userBlogs,
   updateBlog,
-  deleteBlog
+  deleteBlog,
+  LoginInfo
 };
