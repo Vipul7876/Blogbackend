@@ -9,7 +9,8 @@ const Connection = require( './Models/Database' );
 const corsoptions = {
   origin: "http://localhost:5173",
   methods: "GET,POST,PATCH,PUT,DELETE,HEAD",
-  credentials: true
+  credentials: true,
+  exposedHeaders: [ 'Authorization' ],
 };
 
 app.use( CORS( corsoptions ) );

@@ -1,5 +1,6 @@
 const user = require( '../Models/Schema' );
 const blogSchema = require( '../Models/BlogSchema' );
+const adminSchema = require( '../Models/AdminSchema' );
 const crypto = require( 'crypto' );
 const jwt = require( 'jsonwebtoken' );
 
@@ -34,13 +35,14 @@ const signup = async ( req, res ) => {
       password,
     } );
 
+    res.setHeader( 'Authorization', `Bearer ${ await userCreated.generateToken() }` );
+
     res
       .status( 201 )
       .json( {
         status: 'success',
         User: {
           username: await userCreated.username,
-          token: await userCreated.generateToken(),
         }
       } );
 
@@ -65,13 +67,14 @@ const login = async ( req, res ) => {
 
 
     if ( UserExist.password == password ) {
+      res.setHeader( 'Authorization', `Bearer ${ await UserExist.generateToken() }` );
+
       res
         .status( 200 )
         .json( {
           status: 'success',
           User: {
             username: await UserExist.username,
-            id: await UserExist._id.toString(),
           }
         } );
     } else {
@@ -181,6 +184,7 @@ const updateBlog = async ( req, res ) => {
   }
 
 };
+
 const deleteBlog = async ( req, res ) => {
   try {
     const { blogId, username } = req.body;
@@ -208,7 +212,9 @@ const deleteBlog = async ( req, res ) => {
 
 const LoginInfo = async ( req, res ) => {
   try {
-    const { token } = req.body;
+    const { authorization } = req.headers;
+    
+    const token = authorization?.split( ' ' )[1];
 
     const verified = jwt.verify( token, process.env.SECRET_KEY );
     const userdata = await user.findOne( { username: verified.username } );
@@ -227,6 +233,54 @@ const LoginInfo = async ( req, res ) => {
   }
 };
 
+const admin = async ( req, res ) => {
+  try {
+    const { username, password } = req.body;
+
+    const UserExist = await adminSchema.findOne( { username } );
+    if ( !UserExist ) {
+      return res.status( 400 ).json( { status: 'unsuccess', message: 'User does not Exist!' } );
+    }
+
+    if ( UserExist.password == password ) {
+
+      res
+        .status( 200 )
+        .json( {
+          status: 'success',
+          User: {
+            username: await UserExist.username,
+          }
+        } );
+    } else {
+      res
+        .status( 401 )
+        .json( { status: 'unsuccess' } );
+    }
+  } catch ( error ) {
+    res
+      .status( 400 );
+    console.log( error );
+  }
+}
+
+const allUsers = async ( req, res ) => {
+  try {
+  
+    const List = await user.find( );
+
+    res
+      .status( 200 )
+      .json( List );
+
+  } catch ( error ) {
+    res
+      .status( 400 );
+    console.log( error );
+
+  }
+}
+
 module.exports = {
   home,
   login,
@@ -235,5 +289,7 @@ module.exports = {
   userBlogs,
   updateBlog,
   deleteBlog,
-  LoginInfo
+  LoginInfo,
+  admin,
+  allUsers
 };

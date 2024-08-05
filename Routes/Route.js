@@ -19,17 +19,29 @@ Router
 Router
   .route( '/login' )
   .post( Controller.login );
+
 Router
   .route( '/myblogs' )
   .post( Controller.addBlog );
+
 Router
   .route( '/myblogs/update' )
   .post( Controller.updateBlog );
+
 Router
   .route( '/blog' )
   .post( Controller.deleteBlog );
+
 Router
   .route( '/nav' )
   .post( Controller.LoginInfo );
+  
+Router
+  .route( '/admin' )
+  .post( Controller.admin );
+Router
+  .route( '/users_list' )
+  .get( Controller.allUsers );
+
 
 module.exports = Router;
