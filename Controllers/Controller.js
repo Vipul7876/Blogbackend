@@ -1,9 +1,20 @@
 const user = require( '../Models/Schema' );
 const blogSchema = require( '../Models/BlogSchema' );
 const adminSchema = require( '../Models/AdminSchema' );
-const crypto = require( 'crypto' );
-const jwt = require( 'jsonwebtoken' );
+const crypto = require( 'crypto' );// For BlogId
+const jwt = require( 'jsonwebtoken' );// For Authentication
+const bcrypt = require( 'bcryptjs' );// For Password Hashig
 
+async function hashPassword ( password ) {
+  const saltRounds = 10; // Adjust the number of salt rounds for increased security
+  const hashedPassword = await bcrypt.hash( password, saltRounds );
+  return hashedPassword;
+}
+
+async function verifyPassword ( password, hashedPassword ) {
+  const match = await bcrypt.compare( password, hashedPassword );
+  return match;
+}
 
 const home = async ( req, res ) => {
 
@@ -30,9 +41,11 @@ const signup = async ( req, res ) => {
       return res.status( 400 ).json( { status: 'unsuccess', message: 'User already Exist!' } );
     }
 
+    const hashedPassword = hashPassword( password );
+
     const userCreated = await user.create( {
-      username,
-      password,
+      username: username,
+      password: await hashedPassword,
     } );
 
     res.setHeader( 'Authorization', `Bearer ${ await userCreated.generateToken() }` );
@@ -65,8 +78,9 @@ const login = async ( req, res ) => {
       return res.status( 400 ).json( { status: 'unsuccess', message: 'User does not Exist!' } );
     }
 
+    const isVerified = await verifyPassword( password, UserExist?.password );
 
-    if ( UserExist.password == password ) {
+    if ( isVerified ) {
       res.setHeader( 'Authorization', `Bearer ${ await UserExist.generateToken() }` );
 
       res
@@ -213,8 +227,8 @@ const deleteBlog = async ( req, res ) => {
 const LoginInfo = async ( req, res ) => {
   try {
     const { authorization } = req.headers;
-    
-    const token = authorization?.split( ' ' )[1];
+
+    const token = authorization?.split( ' ' )[ 1 ];
 
     const verified = jwt.verify( token, process.env.SECRET_KEY );
     const userdata = await user.findOne( { username: verified.username } );
@@ -262,7 +276,7 @@ const admin = async ( req, res ) => {
       .status( 400 );
     console.log( error );
   }
-}
+};
 
 const deleteUser = async ( req, res ) => {
   try {
@@ -287,11 +301,11 @@ const deleteUser = async ( req, res ) => {
     console.log( error );
 
   }
-}
+};
 const allUsers = async ( req, res ) => {
   try {
-  
-    const List = await user.find( );
+
+    const List = await user.find();
 
     res
       .status( 200 )
@@ -303,7 +317,7 @@ const allUsers = async ( req, res ) => {
     console.log( error );
 
   }
-}
+};
 
 module.exports = {
   home,
