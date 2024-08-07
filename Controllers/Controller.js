@@ -264,6 +264,30 @@ const admin = async ( req, res ) => {
   }
 }
 
+const deleteUser = async ( req, res ) => {
+  try {
+    const { username } = req.body;
+
+    const UserExist = await user.findOne( { username } );
+    if ( !UserExist ) {
+      return res.status( 400 ).json( { status: 'unsuccess', message: 'User does not Exist!' } );
+    }
+
+    const deleteduser = await user.findOneAndDelete( { username } );
+
+    res
+      .status( 201 )
+      .json( {
+        status: 'success',
+        User: deleteduser?.username,
+      } );
+  } catch ( error ) {
+    res
+      .status( 400 );
+    console.log( error );
+
+  }
+}
 const allUsers = async ( req, res ) => {
   try {
   
@@ -291,5 +315,6 @@ module.exports = {
   deleteBlog,
   LoginInfo,
   admin,
-  allUsers
+  allUsers,
+  deleteUser
 };

@@ -42,6 +42,9 @@ Router
 Router
   .route( '/users_list' )
   .get( Controller.allUsers );
+Router
+  .route( '/users_list/delete' )
+  .post( Controller.deleteUser );
 
 
 module.exports = Router;
