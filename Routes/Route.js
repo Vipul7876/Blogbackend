@@ -39,12 +39,22 @@ Router
 Router
   .route( '/admin' )
   .post( Controller.admin );
+
 Router
   .route( '/users_list' )
   .get( Controller.allUsers );
+
 Router
   .route( '/users_list/delete' )
   .post( Controller.deleteUser );
+
+Router
+  .route( '/account' )
+  .post( Controller.addBio );
+
+Router
+  .route( '/account/bio' )
+  .post( Controller.getBio );
 
 
 module.exports = Router;

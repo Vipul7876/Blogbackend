@@ -1,5 +1,6 @@
 const mongoose = require( 'mongoose' );
 const jwt = require( 'jsonwebtoken' );
+const { BiObjectsVerticalBottom } = require( 'react-icons/bi' );
 
 const Schema = mongoose.Schema( {
   username: {
@@ -7,6 +8,10 @@ const Schema = mongoose.Schema( {
     require: true
   },
   password: {
+    type: String,
+    require: true
+  },
+  bio: {
     type: String,
     require: true
   },

@@ -88,7 +88,8 @@ const login = async ( req, res ) => {
         .json( {
           status: 'success',
           User: {
-            username: await UserExist.username,
+            username: await UserExist?.username,
+            bio: await UserExist?.bio
           }
         } );
     } else {
@@ -236,7 +237,9 @@ const LoginInfo = async ( req, res ) => {
     res.json( {
       status: 'success',
       User: {
-        username: await userdata.username,
+        username: await userdata?.username,
+        bio: await userdata?.bio,
+
       }
     } );
 
@@ -302,6 +305,7 @@ const deleteUser = async ( req, res ) => {
 
   }
 };
+
 const allUsers = async ( req, res ) => {
   try {
 
@@ -311,6 +315,56 @@ const allUsers = async ( req, res ) => {
       .status( 200 )
       .json( List );
 
+  } catch ( error ) {
+    res
+      .status( 400 );
+    console.log( error );
+
+  }
+};
+
+const addBio = async ( req, res ) => {
+  try {
+    const { username, bio } = req.body;
+
+    const UserExist = await user.findOne( { username } );
+    if ( !UserExist ) {
+      return res.status( 400 ).json( { status: 'unsuccess', message: 'User does not Exist!' } );
+    }
+
+    const updatedUser = await user.findOneAndUpdate( { username }, { bio }, { returnOriginal: false } );
+
+    res
+      .status( 201 )
+      .json( {
+        status: 'success',
+        username: await updatedUser?.username,
+        bio: await updatedUser?.bio,
+      } );
+  } catch ( error ) {
+    res
+      .status( 400 );
+    console.log( error );
+
+  }
+};
+
+const getBio = async ( req, res ) => {
+  try {
+    const { username } = req.body;
+
+    const UserExist = await user.findOne( { username } );
+    if ( !UserExist ) {
+      return res.status( 400 ).json( { status: 'unsuccess', message: 'User does not Exist!' } );
+    }
+
+    res
+      .status( 201 )
+      .json( {
+        status: 'success',
+        username: await UserExist?.username,
+        bio: await UserExist?.bio,
+      } );
   } catch ( error ) {
     res
       .status( 400 );
@@ -330,5 +384,7 @@ module.exports = {
   LoginInfo,
   admin,
   allUsers,
-  deleteUser
+  deleteUser,
+  addBio,
+  getBio
 };
