@@ -7,7 +7,7 @@ const Connection = require( './Models/Database' );
 
 // Middleware
 const corsoptions = {
-  origin: "http://localhost:5173",
+  origin: "https://blogg01.netlify.app",
   methods: "GET,POST,PATCH,PUT,DELETE,HEAD",
   credentials: true,
   exposedHeaders: [ 'Authorization' ],
