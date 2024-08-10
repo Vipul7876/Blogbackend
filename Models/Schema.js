@@ -1,6 +1,5 @@
 const mongoose = require( 'mongoose' );
 const jwt = require( 'jsonwebtoken' );
-const { BiObjectsVerticalBottom } = require( 'react-icons/bi' );
 
 const Schema = mongoose.Schema( {
   username: {
