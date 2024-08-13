@@ -25,7 +25,7 @@ Router
   .post( Controller.addBlog );
 
 Router
-  .route( '/myblogs/update' )
+  .route( '/blog/update' )
   .post( Controller.updateBlog );
 
 Router
