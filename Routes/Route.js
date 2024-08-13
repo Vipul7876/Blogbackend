@@ -56,5 +56,9 @@ Router
   .route( '/account/bio' )
   .post( Controller.getBio );
 
+Router
+  .route( '/account/delete' )
+  .post( Controller.deleteUser );
+
 
 module.exports = Router;

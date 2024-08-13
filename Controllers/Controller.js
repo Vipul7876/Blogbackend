@@ -373,6 +373,7 @@ const getBio = async ( req, res ) => {
   }
 };
 
+
 module.exports = {
   home,
   login,
