@@ -232,18 +232,24 @@ const LoginInfo = async ( req, res ) => {
     const token = authorization?.split( ' ' )[ 1 ];
 
     const verified = jwt.verify( token, process.env.SECRET_KEY );
-    const userdata = await user.findOne( { username: verified.username } );
+    const userdata = await user.findOne( { username: verified?.username } );
 
-    res.json( {
-      status: 'success',
-      User: {
-        username: await userdata?.username,
-        bio: await userdata?.bio,
-
-      }
-    } );
-
-  } catch ( error ) {
+    if ( userdata ) {
+      res.json( {
+        status: 'success',
+        User: {
+          username: await userdata?.username,
+          bio: await userdata?.bio,
+        }
+      } );
+    } else {
+      res
+        .json( {
+          status: 'unsuccess',
+        } );
+    }
+  }
+  catch ( error ) {
     res
       .status( 400 )
       .send( error );
